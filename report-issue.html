@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report Issue</title>
+    <title>Report Issue - JanMitra</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar animate-in">
         <div class="nav-container">
-            <div class="nav-logo"><a href="index.html" style="text-decoration:none;"><h2>Local Issues Reporter</h2></a></div>
+            <div class="nav-logo"><a href="index.html" style="text-decoration:none;"><h2>JanMitra</h2></a></div>
             <ul class="nav-menu">
                 <li><a href="index.html" class="nav-link">Home</a></li>
                 <li><a href="report-issue.html" class="nav-link active">Report Issue</a></li>
@@ -61,6 +61,7 @@
                                 <option value="streetlight">Street Light</option>
                                 <option value="water">Water Leak</option>
                                 <option value="garbage">Garbage</option>
+                                <option value="public_transport">Public Transport</option>
                                 <option value="other">Other</option>
                             </select>
                         </div>
@@ -100,11 +101,9 @@
 
     <script>
         function goToStep(step) {
-            // Hide all steps (Fixes overlap)
             document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.progress-step').forEach(el => el.classList.remove('active'));
             
-            // Show active step
             document.getElementById('step' + step).classList.add('active');
             document.getElementById('progress' + step).classList.add('active');
         }

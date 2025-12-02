@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Issues Reporter</title>
+    <title>JanMitra - Local Issues Reporter</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -11,7 +11,7 @@
     <nav class="navbar animate-in">
         <div class="nav-container">
             <div class="nav-logo">
-                <a href="index.html" style="text-decoration: none;"><h2>Local Issues Reporter</h2></a>
+                <a href="index.html" style="text-decoration: none;"><h2>JanMitra</h2></a>
             </div>
             <ul class="nav-menu">
                 <li><a href="index.html" class="nav-link active">Home</a></li>
@@ -24,10 +24,14 @@
         </div>
     </nav>
 
+    <!-- Hero Section -->
     <section class="hero">
         <div class="container hero-content animate-in delay-100">
             <h1 style="text-align: center;">Make Your Community Better</h1>
-            <p style="text-align: center; max-width: 600px; margin: 0 auto 2rem;">Report local issues, connect with volunteers, and track resolutions. A transparent platform for a better neighborhood.</p>
+            <p style="text-align: center; max-width: 600px; margin: 0 auto 2rem;">
+                Report local issues, connect with volunteers, and track resolutions. 
+                Together, we build a cleaner, safer neighborhood.
+            </p>
             <div class="hero-buttons" style="display: flex; justify-content: center; gap: 1rem;">
                 <a href="report-issue.html" class="btn btn-primary">Report Issue</a>
                 <a href="view-issues.html" class="btn btn-secondary">View Reports</a>
@@ -35,24 +39,152 @@
         </div>
     </section>
 
+    <!-- 1. Common Issues -->
     <section class="categories">
         <div class="container">
-            <h2 class="section-title" style="text-align: center; margin-bottom: 3rem;">What can you report?</h2>
+            <h2 class="section-title text-center">Common Issues</h2>
+            <p class="section-subtitle text-center">What kind of problems can you report?</p>
             <div class="categories-grid animate-in delay-200">
+                <div class="category-card">
+                    <div class="category-icon"><i class="fas fa-trash-alt"></i></div>
+                    <h3>Garbage</h3>
+                    <p>Overflowing bins, illegal dumping, or missed collection.</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon"><i class="fas fa-bus"></i></div>
+                    <h3>Public Transport</h3>
+                    <p>Bus stop damage, schedule issues, or connectivity gaps.</p>
+                </div>
                 <div class="category-card">
                     <div class="category-icon"><i class="fas fa-road"></i></div>
                     <h3>Potholes</h3>
-                    <p>Road damage and traffic hazards.</p>
+                    <p>Damaged roads causing traffic hazards and accidents.</p>
                 </div>
                 <div class="category-card">
                     <div class="category-icon"><i class="fas fa-lightbulb"></i></div>
                     <h3>Street Lights</h3>
-                    <p>Malfunctioning street lighting.</p>
+                    <p>Broken or flickering lights causing safety concerns.</p>
                 </div>
                 <div class="category-card">
-                    <div class="category-icon"><i class="fas fa-trash-alt"></i></div>
-                    <h3>Garbage</h3>
-                    <p>Missed collection or illegal dumping.</p>
+                    <div class="category-icon"><i class="fas fa-tint"></i></div>
+                    <h3>Water Supply</h3>
+                    <p>Pipe leakage, water shortage, or contamination.</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon"><i class="fas fa-question-circle"></i></div>
+                    <h3>Other Issues</h3>
+                    <p>Any other civic issue that needs attention.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Community Impact (Animated) -->
+    <section class="stats-section animate-in delay-200">
+        <div class="container">
+            <h2 class="section-title text-center" style="margin-bottom: 3rem;">Community Impact</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-bullhorn"></i>
+                    <h3 class="counter" data-target="250">0</h3>
+                    <p>Issues Reported</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <h3 class="counter" data-target="180">0</h3>
+                    <p>Issues Resolved</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <h3 class="counter" data-target="50">0</h3>
+                    <p>Active Volunteers</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-smile"></i>
+                    <h3 class="counter" data-target="1000">0</h3>
+                    <p>Citizens Impacted</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. How It Works -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title text-center">How It Works</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon"><i class="fas fa-camera"></i></div>
+                    <h3>Report</h3>
+                    <p>Spot an issue? Take a photo, add details, and submit it instantly.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon"><i class="fas fa-tasks"></i></div>
+                    <h3>Review</h3>
+                    <p>Admins verify the report and assign it to the relevant department or volunteer.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon"><i class="fas fa-hands-helping"></i></div>
+                    <h3>Resolve</h3>
+                    <p>Volunteers or council members fix the issue and update the status.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Recent Issues -->
+    <section class="recent-issues">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 class="section-title" style="margin-bottom: 0;">Recent Issues</h2>
+                <a href="view-issues.html" class="btn btn-outline">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="issues-list">
+                <!-- Example Static Issues -->
+                <div class="issue-card">
+                    <div class="issue-header">
+                        <span class="badge badge-urgent">High Priority</span>
+                        <span class="status-text">Open</span>
+                    </div>
+                    <h3>Broken Street Light at Main St</h3>
+                    <p class="issue-loc"><i class="fas fa-map-marker-alt"></i> Gandhi Nagar, Sector 4</p>
+                    <p class="issue-desc">Street light has been flickering for 2 days...</p>
+                    <div class="issue-footer">
+                        <span><i class="far fa-calendar"></i> 2 hours ago</span>
+                        <span><i class="fas fa-tag"></i> Electrical</span>
+                    </div>
+                </div>
+
+                <div class="issue-card">
+                    <div class="issue-header">
+                        <span class="badge badge-medium">Medium</span>
+                        <span class="status-text text-success">In Progress</span>
+                    </div>
+                    <h3>Garbage Dump near Park</h3>
+                    <p class="issue-loc"><i class="fas fa-map-marker-alt"></i> Central Park Gate 2</p>
+                    <p class="issue-desc">Pile of garbage not collected since Monday.</p>
+                    <div class="issue-footer">
+                        <span><i class="far fa-calendar"></i> 1 day ago</span>
+                        <span><i class="fas fa-tag"></i> Garbage</span>
+                    </div>
+                </div>
+
+                <div class="issue-card">
+                    <div class="issue-header">
+                        <span class="badge badge-low">Low</span>
+                        <span class="status-text text-success">Resolved</span>
+                    </div>
+                    <h3>Bus Stop Bench Broken</h3>
+                    <p class="issue-loc"><i class="fas fa-map-marker-alt"></i> Market Road</p>
+                    <p class="issue-desc">The metal bench is broken and dangerous.</p>
+                    <div class="issue-footer">
+                        <span><i class="far fa-calendar"></i> 3 days ago</span>
+                        <span><i class="fas fa-tag"></i> Transport</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -60,11 +192,56 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Local Issues Reporter</p>
+            <p>&copy; 2025 JanMitra - Local Issues Reporter</p>
         </div>
     </footer>
 
+    <!-- Chatbot Widget -->
+    <div class="chat-widget">
+        <button id="chat-toggle-btn" class="chat-toggle-btn">
+            <i class="fas fa-robot"></i>
+        </button>
+        
+        <div class="chat-container" id="chat-container">
+            <div class="chat-header">
+                <h3>JanMitra Assistant</h3>
+                <button id="chat-close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot-message">
+                    Hello! I'm JanMitra. How can I help you improve our community today?
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Ask a question..." autocomplete="off">
+                <button id="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/data-manager.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/chat.js"></script>
+    <script>
+        // Simple Counter Animation
+        const counters = document.querySelectorAll('.counter');
+        counters.forEach(counter => {
+            counter.innerText = '0';
+            const updateCounter = () => {
+                const target = +counter.getAttribute('data-target');
+                const c = +counter.innerText;
+                const increment = target / 200;
+                if (c < target) {
+                    counter.innerText = `${Math.ceil(c + increment)}`;
+                    setTimeout(updateCounter, 20);
+                } else {
+                    counter.innerText = target + "+";
+                }
+            };
+            // Trigger animation when in viewport could be added here
+            // For now, simple load animation
+            setTimeout(updateCounter, 1000);
+        });
+    </script>
 </body>
 </html>

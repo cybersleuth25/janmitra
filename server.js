@@ -103,3 +103,8 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+// ... top of file imports ...
+const chatRoutes = require('./js/chat'); 
+
+// ... inside app.use section ...
+app.use('/api/chat', chatRoutes);

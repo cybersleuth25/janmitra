@@ -3,82 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Local Issues Reporter</title>
+    <title>Admin Login - JanMitra</title>
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Override body background for a centered login layout */
+        /* Specific styles for the login page layout */
         body {
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Modern Purple-Blue Gradient */
+            padding: 20px;
         }
-        .login-card {
-            background: white;
-            padding: 3rem;
-            border-radius: 16px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        
+        .login-container {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: fadeInUp 0.6s ease-out forwards;
         }
+
         .login-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
-        .login-icon {
-            width: 60px;
-            height: 60px;
-            background: #e0e7ff;
-            color: var(--primary-color);
+
+        .login-icon-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 1.5rem;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        .login-header h2 {
+            color: var(--text-main);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: var(--text-light);
+        }
+
+        /* Form Enhancements */
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .form-group input {
+            padding: 14px 18px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            background: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-block {
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .home-link {
+            display: block;
+            text-align: center;
+            margin-top: 2rem;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        
+        .home-link:hover {
+            opacity: 1;
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="login-card animate-in">
-        <div class="login-header">
-            <div class="login-icon">
-                <i class="fas fa-user-shield"></i>
+    <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        
+        <div class="login-container">
+            <div class="login-header">
+                <div class="login-icon-circle">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h2>Admin Access</h2>
+                <p>JanMitra Management Portal</p>
             </div>
-            <h2>Admin Login</h2>
-            <p>Secure access for officials</p>
+
+            <form action="../includes/admin_login.php" method="POST">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div style="position: relative;">
+                        <input type="text" id="username" name="username" required placeholder="Enter username" style="padding-left: 45px;">
+                        <i class="fas fa-user" style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #cbd5e1;"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div style="position: relative;">
+                        <input type="password" id="password" name="password" required placeholder="Enter password" style="padding-left: 45px;">
+                        <i class="fas fa-lock" style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #cbd5e1;"></i>
+                    </div>
+                </div>
+
+                <div id="errorMsg" style="color: var(--danger-color); text-align: center; margin-bottom: 1.5rem; font-size: 0.9rem; min-height: 20px;"></div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    Sign In Securely
+                </button>
+            </form>
         </div>
 
-        <form action="../includes/admin_login.php" method="POST">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required placeholder="Enter admin username">
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Enter password">
-            </div>
-
-            <div id="errorMsg" style="color: var(--danger-color); text-align: center; margin-bottom: 1rem; font-size: 0.9rem;"></div>
-
-            <button type="submit" class="btn btn-primary" style="width: 100%;">
-                Sign In <i class="fas fa-arrow-right" style="font-size: 0.8rem;"></i>
-            </button>
-        </form>
-
-        <div style="text-align: center; margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1rem;">
-            <a href="../index.html" style="font-size: 0.9rem; color: var(--text-light);">Return to Home</a>
-        </div>
+        <a href="../index.html" class="home-link">
+            <i class="fas fa-arrow-left"></i> Back to JanMitra Home
+        </a>
     </div>
 
     <script>
         // Simple error handling based on URL param
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('error')) {
-            document.getElementById('errorMsg').textContent = "Invalid credentials. Please try again.";
+            document.getElementById('errorMsg').innerHTML = '<i class="fas fa-exclamation-circle"></i> Invalid credentials. Please try again.';
         }
     </script>
 </body>
