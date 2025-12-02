@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Issues - Admin Portal</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default/default.css" rel="stylesheet">
+    <style>
+        /* Admin Specific Table Styles */
+        .admin-table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+        }
+        .status-select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background-color: white;
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .status-select.open { color: #dc2626; border-color: #fecaca; background: #fef2f2; }
+        .status-select.in_progress { color: #d97706; border-color: #fde68a; background: #fffbeb; }
+        .status-select.resolved { color: #059669; border-color: #a7f3d0; background: #ecfdf5; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo"><h2>JanMitra Admin</h2></div>
+            <ul class="nav-menu">
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="../index.html" class="nav-link">View Site</a></li>
+                <li><button onclick="logout()" class="btn btn-secondary btn-small">Logout</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Manage Issues</h1>
+            <p>Update status and review community reports.</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="admin-table-container">
+                <div id="loading" style="text-align: center; padding: 20px;">
+                    <i class="fas fa-spinner fa-spin"></i> Loading data...
+                </div>
+                <table id="issuesTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Issue</th>
+                            <th>Category</th>
+                            <th>Location</th>
+                            <th>Reporter</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="issuesBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../js/admin-issues.js"></script>
+    <script>
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

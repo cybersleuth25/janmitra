@@ -2,8 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const Issue = require('../models/Issue'); // Import the Mongoose model
-// const Volunteer = require('../models/Volunteer'); // Uncomment if you need to check volunteers
+const Issue = require('../models/Issue');
 
 const router = express.Router();
 
@@ -24,30 +23,58 @@ const storage = multer.diskStorage({
 
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
-    
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed'));
-    }
+    if (mimetype && extname) return cb(null, true);
+    cb(new Error('Only image files are allowed'));
   }
 });
+
+// ==========================================
+// 1. SPECIFIC ROUTES MUST COME FIRST
+// ==========================================
+
+// GET /api/issues/stats/summary - Get statistics
+// MOVED TO TOP so it doesn't get confused with /:id
+router.get('/stats/summary', async (req, res) => {
+  try {
+    const totalIssues = await Issue.countDocuments({});
+    // Note: MongoDB matches are case-sensitive. 
+    // We use regex here to be safe (e.g. 'Open' vs 'open')
+    const resolvedIssues = await Issue.countDocuments({ status: { $regex: /^resolved$/i } });
+    const inProgressIssues = await Issue.countDocuments({ status: { $regex: /^in_progress$/i } });
+    
+    // Placeholder for active volunteers if you don't have the model connected yet
+    const activeVolunteers = 0; 
+
+    res.json({
+      totalIssues,
+      resolvedIssues,
+      inProgressIssues,
+      activeVolunteers
+    });
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ error: 'Failed to fetch statistics' });
+  }
+});
+
+// ==========================================
+// 2. GENERAL ROUTES COME NEXT
+// ==========================================
 
 // GET /api/issues - Get all issues with optional filtering
 router.get('/', async (req, res) => {
   try {
     const { status, category, search, limit = 50, offset = 0 } = req.query;
     
-    // Build query object
     const query = {};
     
     if (status) {
-      query.status = status;
+      query.status = { $regex: new RegExp(`^${status}$`, 'i') }; // Case insensitive match
     }
     
     if (category && category !== 'all') {
@@ -62,13 +89,11 @@ router.get('/', async (req, res) => {
       ];
     }
     
-    // Fetch issues from MongoDB
     const issues = await Issue.find(query)
-      .sort({ createdAt: -1 }) // Sort by newest first
+      .sort({ createdAt: -1 })
       .skip(parseInt(offset))
       .limit(parseInt(limit));
     
-    // Get total count
     const total = await Issue.countDocuments(query);
     
     res.json({
@@ -86,6 +111,10 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ==========================================
+// 3. DYNAMIC ID ROUTES COME LAST
+// ==========================================
+
 // GET /api/issues/:id - Get specific issue
 router.get('/:id', async (req, res) => {
   try {
@@ -95,12 +124,12 @@ router.get('/:id', async (req, res) => {
     if (!issue) {
       return res.status(404).json({ error: 'Issue not found' });
     }
-    
-    // In MongoDB, we typically store updates inside the issue document or populate them.
-    // Assuming 'updates' is an array in the Issue model (if not, add it to your schema)
-    // If you haven't added it, this will just return the issue data.
     res.json(issue);
   } catch (error) {
+    // Don't log "CastError" (invalid ID format) as an error to console
+    if (error.name === 'CastError') {
+         return res.status(404).json({ error: 'Issue not found' });
+    }
     console.error('Error fetching issue:', error);
     res.status(500).json({ error: 'Failed to fetch issue' });
   }
@@ -121,14 +150,12 @@ router.post('/', upload.single('photo'), async (req, res) => {
       reporter_phone
     } = req.body;
     
-    // Validate required fields
     if (!title || !description || !category || !location || !reporter_name || !reporter_email) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
     
     const photo_path = req.file ? `/uploads/${req.file.filename}` : null;
     
-    // Create new Issue document
     const newIssue = new Issue({
       title,
       description,
@@ -141,7 +168,6 @@ router.post('/', upload.single('photo'), async (req, res) => {
       reporter_phone,
       photo_path,
       status: 'Open',
-      // Add initial update log if your Schema supports an 'updates' array
       updates: [{
         update_type: 'status_change',
         message: 'Issue reported and submitted for review',
@@ -172,7 +198,7 @@ router.put('/:id', async (req, res) => {
 
     if (status) {
       updateData.status = status;
-      if (status === 'resolved') {
+      if (status.toLowerCase() === 'resolved') {
         updateData.resolved_at = new Date();
       }
       updatesLog.push({
@@ -186,7 +212,6 @@ router.put('/:id', async (req, res) => {
     if (assigned_volunteer_id !== undefined) updateData.assigned_volunteer_id = assigned_volunteer_id;
     if (admin_notes) updateData.admin_notes = admin_notes;
 
-    // Use $set for fields and $push for the updates array
     const result = await Issue.findByIdAndUpdate(
       id,
       { 
@@ -211,54 +236,24 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
     const issue = await Issue.findById(id);
     
     if (!issue) {
       return res.status(404).json({ error: 'Issue not found' });
     }
     
-    // Delete associated photo file if exists
     if (issue.photo_path) {
       const photoPath = path.join(__dirname, '..', issue.photo_path);
       if (fs.existsSync(photoPath)) {
-        try {
-          fs.unlinkSync(photoPath);
-        } catch(e) {
-          console.error("Could not delete file:", e);
-        }
+        try { fs.unlinkSync(photoPath); } catch(e) { console.error(e); }
       }
     }
 
     await Issue.findByIdAndDelete(id);
-    
     res.json({ message: 'Issue deleted successfully' });
   } catch (error) {
     console.error('Error deleting issue:', error);
     res.status(500).json({ error: 'Failed to delete issue' });
-  }
-});
-
-// GET /api/issues/stats/summary - Get statistics
-router.get('/stats/summary', async (req, res) => {
-  try {
-    const totalIssues = await Issue.countDocuments({});
-    const resolvedIssues = await Issue.countDocuments({ status: 'resolved' }); // Ensure status matches your DB (case sensitive)
-    const inProgressIssues = await Issue.countDocuments({ status: 'in_progress' });
-    
-    // If you have a Volunteer model, uncomment below:
-    // const activeVolunteers = await Volunteer.countDocuments({ status: 'active' });
-    const activeVolunteers = 0; // Placeholder until Volunteer model is connected
-
-    res.json({
-      totalIssues,
-      resolvedIssues,
-      inProgressIssues,
-      activeVolunteers
-    });
-  } catch (error) {
-    console.error('Error fetching stats:', error);
-    res.status(500).json({ error: 'Failed to fetch statistics' });
   }
 });
 

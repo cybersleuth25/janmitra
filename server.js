@@ -4,7 +4,8 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
-const connectDB = require('./database/db'); // Import the Mongo connection function
+const connectDB = require('./database/db');
+const chatRoutes = require('./routes/chat');
 require('dotenv').config();
 
 // Import routes
@@ -20,10 +21,11 @@ const PORT = process.env.PORT || 3000;
 // Connect to MongoDB
 connectDB();
 
-// Rate limiting
+// Rate limiting - INCREASED LIMIT FOR DEVELOPMENT
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  max: 10000, // <--- CHANGED FROM 100 TO 10000
+  message: "Too many requests from this IP, please try again later."
 });
 
 // Middleware
@@ -36,7 +38,6 @@ app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 // Serve static files (frontend)
-// This line automatically serves your index.html, css/style.css, and js/chat.js
 app.use(express.static(path.join(__dirname)));
 
 // API routes
@@ -44,6 +45,7 @@ app.use('/api/issues', issuesRoutes);
 app.use('/api/volunteers', volunteersRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

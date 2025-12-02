@@ -6,6 +6,7 @@
     <title>View Issues - JanMitra</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default/default.css" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar animate-in">
@@ -81,48 +82,15 @@
         </div>
     </section>
 
-    <div id="issueModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Issue Details</h2>
-                <span class="close" onclick="closeIssueModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                    <div><strong>ID:</strong> <span id="detailId"></span></div>
-                    <div><strong>Status:</strong> <span id="detailStatus"></span></div>
-                    <div><strong>Category:</strong> <span id="detailCategory"></span></div>
-                    <div><strong>Date:</strong> <span id="detailDate"></span></div>
-                </div>
-                
-                <div class="content-section">
-                    <h4>Description</h4>
-                    <p id="detailDescription"></p>
-                </div>
-
-                <div class="content-section">
-                    <h4>Location</h4>
-                    <p id="detailAddress"></p>
-                </div>
-                
-                <div id="detailPhotoContainer" style="display:none; margin-top: 1rem;">
-                    <img id="detailPhoto" style="width: 100%; border-radius: 8px;" alt="Issue Photo">
-                </div>
-            </div>
-            <div class="modal-footer" style="margin-top: 2rem; text-align: right;">
-                <button class="btn btn-secondary" onclick="closeIssueModal()">Close</button>
-            </div>
-        </div>
-    </div>
-
     <footer class="footer">
         <div class="container">
             <p>&copy; 2025 JanMitra - Local Issues Reporter</p>
         </div>
     </footer>
 
-    <script src="js/data-manager.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script src="js/main.js"></script>
-    <script src="js/view-issues.js"></script>
+    <script src="js/view-issues.js?v=2.0"></script>
 </body>
 </html>
