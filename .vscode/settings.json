@@ -8,5 +8,8 @@
     "files.associations": {
         "*.php": "php"
     },
-    "terminal.integrated.defaultProfile.windows": "PowerShell"
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "cSpell.words": [
+        "janmitra"
+    ]
 }

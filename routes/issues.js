@@ -2,7 +2,8 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const database = require('../database/db');
+const Issue = require('../models/Issue'); // Import the Mongoose model
+// const Volunteer = require('../models/Volunteer'); // Uncomment if you need to check volunteers
 
 const router = express.Router();
 
@@ -37,60 +38,38 @@ const upload = multer({
   }
 });
 
-// Initialize database connection
-database.connect().then(() => {
-  database.initializeTables();
-});
-
 // GET /api/issues - Get all issues with optional filtering
 router.get('/', async (req, res) => {
   try {
     const { status, category, search, limit = 50, offset = 0 } = req.query;
     
-    let sql = `SELECT * FROM issues WHERE 1=1`;
-    const params = [];
+    // Build query object
+    const query = {};
     
     if (status) {
-      sql += ` AND status = ?`;
-      params.push(status);
+      query.status = status;
     }
     
     if (category && category !== 'all') {
-      sql += ` AND category = ?`;
-      params.push(category);
+      query.category = category;
     }
     
     if (search) {
-      sql += ` AND (title LIKE ? OR description LIKE ? OR location LIKE ?)`;
-      params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { location: { $regex: search, $options: 'i' } }
+      ];
     }
     
-    sql += ` ORDER BY created_at DESC LIMIT ? OFFSET ?`;
-    params.push(parseInt(limit), parseInt(offset));
+    // Fetch issues from MongoDB
+    const issues = await Issue.find(query)
+      .sort({ createdAt: -1 }) // Sort by newest first
+      .skip(parseInt(offset))
+      .limit(parseInt(limit));
     
-    const issues = await database.all(sql, params);
-    
-    // Get total count for pagination
-    let countSql = `SELECT COUNT(*) as total FROM issues WHERE 1=1`;
-    const countParams = [];
-    
-    if (status) {
-      countSql += ` AND status = ?`;
-      countParams.push(status);
-    }
-    
-    if (category && category !== 'all') {
-      countSql += ` AND category = ?`;
-      countParams.push(category);
-    }
-    
-    if (search) {
-      countSql += ` AND (title LIKE ? OR description LIKE ? OR location LIKE ?)`;
-      countParams.push(`%${search}%`, `%${search}%`, `%${search}%`);
-    }
-    
-    const totalResult = await database.get(countSql, countParams);
-    const total = totalResult.total;
+    // Get total count
+    const total = await Issue.countDocuments(query);
     
     res.json({
       issues,
@@ -111,19 +90,16 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const issue = await database.get('SELECT * FROM issues WHERE id = ?', [id]);
+    const issue = await Issue.findById(id);
     
     if (!issue) {
       return res.status(404).json({ error: 'Issue not found' });
     }
     
-    // Get issue updates/comments
-    const updates = await database.all(
-      'SELECT * FROM issue_updates WHERE issue_id = ? ORDER BY created_at ASC',
-      [id]
-    );
-    
-    res.json({ ...issue, updates });
+    // In MongoDB, we typically store updates inside the issue document or populate them.
+    // Assuming 'updates' is an array in the Issue model (if not, add it to your schema)
+    // If you haven't added it, this will just return the issue data.
+    res.json(issue);
   } catch (error) {
     console.error('Error fetching issue:', error);
     res.status(500).json({ error: 'Failed to fetch issue' });
@@ -152,28 +128,32 @@ router.post('/', upload.single('photo'), async (req, res) => {
     
     const photo_path = req.file ? `/uploads/${req.file.filename}` : null;
     
-    const result = await database.run(
-      `INSERT INTO issues (
-        title, description, category, location, latitude, longitude,
-        reporter_name, reporter_email, reporter_phone, photo_path
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        title, description, category, location,
-        latitude ? parseFloat(latitude) : null,
-        longitude ? parseFloat(longitude) : null,
-        reporter_name, reporter_email, reporter_phone, photo_path
-      ]
-    );
-    
-    // Add initial status update
-    await database.run(
-      'INSERT INTO issue_updates (issue_id, update_type, message) VALUES (?, ?, ?)',
-      [result.id, 'status_change', 'Issue reported and submitted for review']
-    );
+    // Create new Issue document
+    const newIssue = new Issue({
+      title,
+      description,
+      category,
+      location,
+      latitude: latitude ? parseFloat(latitude) : null,
+      longitude: longitude ? parseFloat(longitude) : null,
+      reporter_name,
+      reporter_email,
+      reporter_phone,
+      photo_path,
+      status: 'Open',
+      // Add initial update log if your Schema supports an 'updates' array
+      updates: [{
+        update_type: 'status_change',
+        message: 'Issue reported and submitted for review',
+        created_at: new Date()
+      }]
+    });
+
+    const result = await newIssue.save();
     
     res.status(201).json({
       message: 'Issue reported successfully',
-      issueId: result.id
+      issueId: result._id
     });
   } catch (error) {
     console.error('Error creating issue:', error);
@@ -187,52 +167,40 @@ router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { status, priority, assigned_volunteer_id, admin_notes } = req.body;
     
-    const updates = [];
-    const params = [];
-    
+    const updateData = { updatedAt: Date.now() };
+    const updatesLog = [];
+
     if (status) {
-      updates.push('status = ?');
-      params.push(status);
+      updateData.status = status;
+      if (status === 'resolved') {
+        updateData.resolved_at = new Date();
+      }
+      updatesLog.push({
+        update_type: 'status_change',
+        message: `Status changed to: ${status}`,
+        created_at: new Date()
+      });
     }
     
-    if (priority) {
-      updates.push('priority = ?');
-      params.push(priority);
-    }
+    if (priority) updateData.priority = priority;
+    if (assigned_volunteer_id !== undefined) updateData.assigned_volunteer_id = assigned_volunteer_id;
+    if (admin_notes) updateData.admin_notes = admin_notes;
+
+    // Use $set for fields and $push for the updates array
+    const result = await Issue.findByIdAndUpdate(
+      id,
+      { 
+        $set: updateData,
+        $push: { updates: { $each: updatesLog } } 
+      },
+      { new: true }
+    );
     
-    if (assigned_volunteer_id !== undefined) {
-      updates.push('assigned_volunteer_id = ?');
-      params.push(assigned_volunteer_id);
-    }
-    
-    if (admin_notes) {
-      updates.push('admin_notes = ?');
-      params.push(admin_notes);
-    }
-    
-    if (status === 'resolved') {
-      updates.push('resolved_at = CURRENT_TIMESTAMP');
-    }
-    
-    updates.push('updated_at = CURRENT_TIMESTAMP');
-    params.push(id);
-    
-    const sql = `UPDATE issues SET ${updates.join(', ')} WHERE id = ?`;
-    const result = await database.run(sql, params);
-    
-    if (result.changes === 0) {
+    if (!result) {
       return res.status(404).json({ error: 'Issue not found' });
     }
     
-    // Add update log
-    if (status) {
-      await database.run(
-        'INSERT INTO issue_updates (issue_id, update_type, message) VALUES (?, ?, ?)',
-        [id, 'status_change', `Status changed to: ${status}`]
-      );
-    }
-    
-    res.json({ message: 'Issue updated successfully' });
+    res.json({ message: 'Issue updated successfully', issue: result });
   } catch (error) {
     console.error('Error updating issue:', error);
     res.status(500).json({ error: 'Failed to update issue' });
@@ -244,23 +212,25 @@ router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Check if issue exists and get photo path
-    const issue = await database.get('SELECT photo_path FROM issues WHERE id = ?', [id]);
+    const issue = await Issue.findById(id);
     
     if (!issue) {
       return res.status(404).json({ error: 'Issue not found' });
     }
     
-    // Delete the issue (this will cascade delete related updates)
-    const result = await database.run('DELETE FROM issues WHERE id = ?', [id]);
-    
     // Delete associated photo file if exists
     if (issue.photo_path) {
       const photoPath = path.join(__dirname, '..', issue.photo_path);
       if (fs.existsSync(photoPath)) {
-        fs.unlinkSync(photoPath);
+        try {
+          fs.unlinkSync(photoPath);
+        } catch(e) {
+          console.error("Could not delete file:", e);
+        }
       }
     }
+
+    await Issue.findByIdAndDelete(id);
     
     res.json({ message: 'Issue deleted successfully' });
   } catch (error) {
@@ -272,18 +242,19 @@ router.delete('/:id', async (req, res) => {
 // GET /api/issues/stats/summary - Get statistics
 router.get('/stats/summary', async (req, res) => {
   try {
-    const stats = await Promise.all([
-      database.get('SELECT COUNT(*) as count FROM issues'),
-      database.get('SELECT COUNT(*) as count FROM issues WHERE status = "resolved"'),
-      database.get('SELECT COUNT(*) as count FROM issues WHERE status = "in_progress"'),
-      database.get('SELECT COUNT(*) as count FROM volunteers WHERE status = "active"')
-    ]);
+    const totalIssues = await Issue.countDocuments({});
+    const resolvedIssues = await Issue.countDocuments({ status: 'resolved' }); // Ensure status matches your DB (case sensitive)
+    const inProgressIssues = await Issue.countDocuments({ status: 'in_progress' });
     
+    // If you have a Volunteer model, uncomment below:
+    // const activeVolunteers = await Volunteer.countDocuments({ status: 'active' });
+    const activeVolunteers = 0; // Placeholder until Volunteer model is connected
+
     res.json({
-      totalIssues: stats[0].count,
-      resolvedIssues: stats[1].count,
-      inProgressIssues: stats[2].count,
-      activeVolunteers: stats[3].count
+      totalIssues,
+      resolvedIssues,
+      inProgressIssues,
+      activeVolunteers
     });
   } catch (error) {
     console.error('Error fetching stats:', error);

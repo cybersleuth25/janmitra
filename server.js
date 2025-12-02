@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const connectDB = require('./database/db'); // Import the Mongo connection function
 require('dotenv').config();
 
 // Import routes
@@ -15,6 +16,9 @@ const adminRoutes = require('./routes/admin');
 // Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Connect to MongoDB
+connectDB();
 
 // Rate limiting
 const limiter = rateLimit({
@@ -32,6 +36,7 @@ app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 // Serve static files (frontend)
+// This line automatically serves your index.html, css/style.css, and js/chat.js
 app.use(express.static(path.join(__dirname)));
 
 // API routes
@@ -99,12 +104,7 @@ app.listen(PORT, () => {
   console.log(`🚀 Local Issues Reporter Server running on port ${PORT}`);
   console.log(`📝 Frontend available at: http://localhost:${PORT}`);
   console.log(`🔗 API endpoints available at: http://localhost:${PORT}/api`);
-  console.log(`💾 Database: SQLite (local file)`);
+  console.log(`🍃 Database: MongoDB`);
 });
 
 module.exports = app;
-// ... top of file imports ...
-const chatRoutes = require('./js/chat'); 
-
-// ... inside app.use section ...
-app.use('/api/chat', chatRoutes);

@@ -1,15 +1,10 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const database = require('../database/db');
-
+const User = require('../models/User');
+const Session = require('../models/session');
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-
-// Initialize database connection
-database.connect().then(() => {
-  database.initializeTables();
-});
 
 // POST /api/auth/login - User login
 router.post('/login', async (req, res) => {
@@ -21,10 +16,7 @@ router.post('/login', async (req, res) => {
     }
     
     // Find user by username
-    const user = await database.get(
-      'SELECT * FROM users WHERE username = ? AND role = ?',
-      [username, role]
-    );
+    const user = await User.findOne({ username, role });
     
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -40,7 +32,7 @@ router.post('/login', async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { 
-        id: user.id, 
+        id: user._id, 
         username: user.username, 
         role: user.role 
       },
@@ -50,16 +42,19 @@ router.post('/login', async (req, res) => {
     
     // Store session
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-    await database.run(
-      'INSERT INTO admin_sessions (user_id, session_token, expires_at) VALUES (?, ?, ?)',
-      [user.id, token, expiresAt.toISOString()]
-    );
+    
+    const newSession = new Session({
+        user_id: user._id,
+        session_token: token,
+        expires_at: expiresAt
+    });
+    await newSession.save();
     
     res.json({
       message: 'Login successful',
       token,
       user: {
-        id: user.id,
+        id: user._id,
         username: user.username,
         email: user.email,
         role: user.role,
@@ -81,11 +76,8 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Username, email, and password are required' });
     }
     
-    // Check if username already exists
-    const existingUser = await database.get(
-      'SELECT id FROM users WHERE username = ? OR email = ?',
-      [username, email]
-    );
+    // Check if username or email already exists
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     
     if (existingUser) {
       return res.status(409).json({ error: 'Username or email already exists' });
@@ -96,14 +88,20 @@ router.post('/register', async (req, res) => {
     const password_hash = await bcrypt.hash(password, saltRounds);
     
     // Create user
-    const result = await database.run(
-      'INSERT INTO users (username, email, password_hash, role, full_name, phone) VALUES (?, ?, ?, ?, ?, ?)',
-      [username, email, password_hash, role, full_name, phone]
-    );
+    const newUser = new User({
+        username,
+        email,
+        password_hash,
+        role,
+        full_name,
+        phone
+    });
+
+    const result = await newUser.save();
     
     res.status(201).json({
       message: 'User registered successfully',
-      userId: result.id
+      userId: result._id
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -118,10 +116,7 @@ router.post('/logout', async (req, res) => {
     
     if (token) {
       // Remove session from database
-      await database.run(
-        'DELETE FROM admin_sessions WHERE session_token = ?',
-        [token]
-      );
+      await Session.deleteOne({ session_token: token });
     }
     
     res.json({ message: 'Logout successful' });
@@ -143,21 +138,18 @@ router.post('/verify', async (req, res) => {
     // Verify JWT token
     const decoded = jwt.verify(token, JWT_SECRET);
     
-    // Check if session exists in database
-    const session = await database.get(
-      'SELECT * FROM admin_sessions WHERE session_token = ? AND expires_at > CURRENT_TIMESTAMP',
-      [token]
-    );
+    // Check if session exists in database and matches token
+    const session = await Session.findOne({ 
+        session_token: token, 
+        expires_at: { $gt: new Date() } 
+    });
     
     if (!session) {
       return res.status(401).json({ error: 'Session expired or invalid' });
     }
     
     // Get user details
-    const user = await database.get(
-      'SELECT id, username, email, role, full_name FROM users WHERE id = ?',
-      [decoded.id]
-    );
+    const user = await User.findById(decoded.id).select('id username email role full_name');
     
     if (!user) {
       return res.status(401).json({ error: 'User not found' });
@@ -185,10 +177,10 @@ const authenticateToken = async (req, res, next) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     
     // Check if session exists
-    const session = await database.get(
-      'SELECT * FROM admin_sessions WHERE session_token = ? AND expires_at > CURRENT_TIMESTAMP',
-      [token]
-    );
+    const session = await Session.findOne({ 
+        session_token: token, 
+        expires_at: { $gt: new Date() } 
+    });
     
     if (!session) {
       return res.status(401).json({ error: 'Session expired' });
@@ -221,7 +213,7 @@ router.post('/change-password', authenticateToken, async (req, res) => {
     }
     
     // Get user
-    const user = await database.get('SELECT * FROM users WHERE id = ?', [req.user.id]);
+    const user = await User.findById(req.user.id);
     
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -239,10 +231,9 @@ router.post('/change-password', authenticateToken, async (req, res) => {
     const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
     
     // Update password
-    await database.run(
-      'UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-      [newPasswordHash, req.user.id]
-    );
+    user.password_hash = newPasswordHash;
+    user.updatedAt = Date.now();
+    await user.save();
     
     res.json({ message: 'Password changed successfully' });
   } catch (error) {
