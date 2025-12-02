@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Test - Local Issues Reporter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .result {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+            font-family: monospace;
+        }
+        .success { border-left-color: #28a745; }
+        .error { border-left-color: #dc3545; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Session Test - Local Issues Reporter</h1>
+    
+    <div class="test-section">
+        <h2>Current Session Status</h2>
+        <button onclick="checkSession()">Check Session</button>
+        <div id="sessionResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Admin Login Test</h2>
+        <button onclick="testAdminLogin()">Login as Admin</button>
+        <button onclick="testAdminDashboard()">Test Admin Dashboard</button>
+        <div id="adminResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Council Login Test</h2>
+        <button onclick="testCouncilLogin()">Login as Council</button>
+        <button onclick="testCouncilDashboard()">Test Council Dashboard</button>
+        <div id="councilResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Quick Actions</h2>
+        <button onclick="window.location.href='admin/login.html'">Go to Admin Login</button>
+        <button onclick="window.location.href='council/login.html'">Go to Council Login</button>
+        <button onclick="clearAll()">Clear All Sessions</button>
+    </div>
+
+    <script>
+        async function checkSession() {
+            try {
+                const response = await fetch('includes/test_session.php');
+                const result = await response.json();
+                
+                document.getElementById('sessionResult').innerHTML = `
+                    <h4>Session Information:</h4>
+                    <strong>Session ID:</strong> ${result.data.session_id}<br>
+                    <strong>Admin Logged In:</strong> ${result.data.admin_logged_in ? 'Yes' : 'No'}<br>
+                    <strong>Admin Username:</strong> ${result.data.admin_username || 'None'}<br>
+                    <strong>Council Logged In:</strong> ${result.data.council_logged_in ? 'Yes' : 'No'}<br>
+                    <strong>Council Username:</strong> ${result.data.council_username || 'None'}<br>
+                `;
+                document.getElementById('sessionResult').className = 'result success';
+            } catch (error) {
+                document.getElementById('sessionResult').innerHTML = 'Error checking session: ' + error;
+                document.getElementById('sessionResult').className = 'result error';
+            }
+        }
+
+        async function testAdminLogin() {
+            try {
+                const response = await fetch('includes/admin_login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: 'admin123' })
+                });
+                
+                const result = await response.json();
+                
+                document.getElementById('adminResult').innerHTML = `
+                    <h4>Admin Login Result:</h4>
+                    <strong>Success:</strong> ${result.success ? 'Yes' : 'No'}<br>
+                    <strong>Message:</strong> ${result.message}<br>
+                `;
+                document.getElementById('adminResult').className = result.success ? 'result success' : 'result error';
+            } catch (error) {
+                document.getElementById('adminResult').innerHTML = 'Error: ' + error;
+                document.getElementById('adminResult').className = 'result error';
+            }
+        }
+
+        async function testAdminDashboard() {
+            try {
+                const response = await fetch('includes/admin_dashboard.php');
+                const result = await response.json();
+                
+                document.getElementById('adminResult').innerHTML = `
+                    <h4>Admin Dashboard Access:</h4>
+                    <strong>Success:</strong> ${result.success ? 'Yes' : 'No'}<br>
+                    <strong>Message:</strong> ${result.message}<br>
+                    ${result.success ? `<strong>Issues:</strong> ${result.data.issues.length}<br><strong>Volunteers:</strong> ${result.data.volunteers.length}` : ''}
+                `;
+                document.getElementById('adminResult').className = result.success ? 'result success' : 'result error';
+            } catch (error) {
+                document.getElementById('adminResult').innerHTML = 'Error: ' + error;
+                document.getElementById('adminResult').className = 'result error';
+            }
+        }
+
+        async function testCouncilLogin() {
+            try {
+                const response = await fetch('includes/council_login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'council.mayor', password: 'admin123' })
+                });
+                
+                const result = await response.json();
+                
+                document.getElementById('councilResult').innerHTML = `
+                    <h4>Council Login Result:</h4>
+                    <strong>Success:</strong> ${result.success ? 'Yes' : 'No'}<br>
+                    <strong>Message:</strong> ${result.message}<br>
+                    ${result.success ? `<strong>User:</strong> ${result.data.council_user.full_name}` : ''}
+                `;
+                document.getElementById('councilResult').className = result.success ? 'result success' : 'result error';
+            } catch (error) {
+                document.getElementById('councilResult').innerHTML = 'Error: ' + error;
+                document.getElementById('councilResult').className = 'result error';
+            }
+        }
+
+        async function testCouncilDashboard() {
+            try {
+                const response = await fetch('includes/council_dashboard.php');
+                const result = await response.json();
+                
+                document.getElementById('councilResult').innerHTML = `
+                    <h4>Council Dashboard Access:</h4>
+                    <strong>Success:</strong> ${result.success ? 'Yes' : 'No'}<br>
+                    <strong>Message:</strong> ${result.message}<br>
+                    ${result.success ? `<strong>Total Issues:</strong> ${result.data.statistics.issues.total}` : ''}
+                `;
+                document.getElementById('councilResult').className = result.success ? 'result success' : 'result error';
+            } catch (error) {
+                document.getElementById('councilResult').innerHTML = 'Error: ' + error;
+                document.getElementById('councilResult').className = 'result error';
+            }
+        }
+
+        async function clearAll() {
+            try {
+                await fetch('includes/admin_logout.php', { method: 'POST' });
+                await fetch('includes/council_logout.php', { method: 'POST' });
+                alert('All sessions cleared!');
+                checkSession();
+            } catch (error) {
+                alert('Error clearing sessions: ' + error);
+            }
+        }
+
+        // Check session on page load
+        checkSession();
+    </script>
+</body>
+</html>

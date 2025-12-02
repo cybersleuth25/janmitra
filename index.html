@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Issues Reporter</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar animate-in">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html" style="text-decoration: none;"><h2>Local Issues Reporter</h2></a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link active">Home</a></li>
+                <li><a href="report-issue.html" class="nav-link">Report Issue</a></li>
+                <li><a href="view-issues.html" class="nav-link">View Issues</a></li>
+                <li><a href="volunteers.html" class="nav-link">Volunteers</a></li>
+                <li><a href="admin/login.html" class="admin-link"><i class="fas fa-lock"></i> Admin</a></li>
+            </ul>
+            <div class="hamburger"><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container hero-content animate-in delay-100">
+            <h1 style="text-align: center;">Make Your Community Better</h1>
+            <p style="text-align: center; max-width: 600px; margin: 0 auto 2rem;">Report local issues, connect with volunteers, and track resolutions. A transparent platform for a better neighborhood.</p>
+            <div class="hero-buttons" style="display: flex; justify-content: center; gap: 1rem;">
+                <a href="report-issue.html" class="btn btn-primary">Report Issue</a>
+                <a href="view-issues.html" class="btn btn-secondary">View Reports</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="categories">
+        <div class="container">
+            <h2 class="section-title" style="text-align: center; margin-bottom: 3rem;">What can you report?</h2>
+            <div class="categories-grid animate-in delay-200">
+                <div class="category-card">
+                    <div class="category-icon"><i class="fas fa-road"></i></div>
+                    <h3>Potholes</h3>
+                    <p>Road damage and traffic hazards.</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon"><i class="fas fa-lightbulb"></i></div>
+                    <h3>Street Lights</h3>
+                    <p>Malfunctioning street lighting.</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon"><i class="fas fa-trash-alt"></i></div>
+                    <h3>Garbage</h3>
+                    <p>Missed collection or illegal dumping.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Local Issues Reporter</p>
+        </div>
+    </footer>
+
+    <script src="js/data-manager.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

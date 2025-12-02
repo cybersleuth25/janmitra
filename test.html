@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Manager Test - Local Issues Reporter</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container" style="padding: 2rem 0;">
+        <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+            <h1>Data Manager Test Page</h1>
+            <p>This page tests the localStorage-based data management system.</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0;">
+                <div>
+                    <h3>Issues Statistics</h3>
+                    <div id="issues-stats"></div>
+                    <button onclick="showIssues()">Show All Issues</button>
+                    <button onclick="clearData()">Clear All Data</button>
+                </div>
+                
+                <div>
+                    <h3>Volunteers Statistics</h3>
+                    <div id="volunteers-stats"></div>
+                    <button onclick="showVolunteers()">Show All Volunteers</button>
+                    <button onclick="testAdmin()">Test Admin Login</button>
+                </div>
+            </div>
+            
+            <div id="output" style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; white-space: pre-wrap; font-family: monospace; max-height: 400px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <script src="js/data-manager.js"></script>
+    <script>
+        function log(message) {
+            const output = document.getElementById('output');
+            output.textContent += new Date().toLocaleTimeString() + ': ' + message + '\n';
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function showIssues() {
+            const issues = window.dataManager.getIssues();
+            log(`Found ${issues.length} issues:`);
+            issues.forEach(issue => {
+                log(`- Issue #${issue.id}: ${issue.title} (${issue.status})`);
+            });
+        }
+        
+        function showVolunteers() {
+            const volunteers = window.dataManager.getVolunteers();
+            log(`Found ${volunteers.length} volunteers:`);
+            volunteers.forEach(volunteer => {
+                log(`- ${volunteer.name} (${volunteer.area})`);
+            });
+        }
+        
+        function testAdmin() {
+            const isAuth = window.dataManager.isAdminAuthenticated();
+            log(`Admin authenticated: ${isAuth}`);
+            
+            if (!isAuth) {
+                const success = window.dataManager.authenticateAdmin('admin', 'admin123');
+                log(`Login attempt with admin/admin123: ${success}`);
+                if (success) {
+                    log('Admin logged in successfully!');
+                }
+            } else {
+                window.dataManager.logoutAdmin();
+                log('Admin logged out');
+            }
+        }
+        
+        function clearData() {
+            if (confirm('Are you sure you want to clear all data? This will reset to sample data.')) {
+                window.dataManager.clearAllData();
+                location.reload();
+            }
+        }
+        
+        function updateStats() {
+            const stats = window.dataManager.getStatistics();
+            const issues = window.dataManager.getIssues();
+            const volunteers = window.dataManager.getVolunteers();
+            
+            document.getElementById('issues-stats').innerHTML = `
+                <p>Total Issues: ${stats.totalIssues}</p>
+                <p>Open: ${stats.openIssues}</p>
+                <p>In Progress: ${stats.inProgressIssues}</p>
+                <p>Resolved: ${stats.resolvedIssues}</p>
+            `;
+            
+            document.getElementById('volunteers-stats').innerHTML = `
+                <p>Active Volunteers: ${stats.activeVolunteers}</p>
+                <p>Areas Covered: ${[...new Set(volunteers.map(v => v.area))].length}</p>
+            `;
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Data Manager Test Page Loaded');
+            log('Backend disconnected - using localStorage');
+            updateStats();
+            
+            // Show initial data summary
+            const stats = window.dataManager.getStatistics();
+            log(`System initialized with ${stats.totalIssues} issues and ${stats.activeVolunteers} volunteers`);
+        });
+    </script>
+</body>
+</html>

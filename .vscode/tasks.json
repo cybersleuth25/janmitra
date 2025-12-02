@@ -1,0 +1,42 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start XAMPP Apache & MySQL",
+            "type": "shell",
+            "command": "C:\\xampp\\xampp_start.exe",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Open Website in Browser",
+            "type": "shell",
+            "command": "start",
+            "args": ["http://localhost/LocalIssuesWebsite/"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "silent"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Start PHP Development Server",
+            "type": "shell",
+            "command": "C:\\xampp\\php\\php.exe",
+            "args": ["-S", "localhost:8080", "-t", "."],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

@@ -1,0 +1,36 @@
+{
+    // VS Code launch configuration for Local Issues Website
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Website (XAMPP)",
+            "type": "msedge",
+            "request": "launch",
+            "url": "http://localhost/LocalIssuesWebsite/",
+            "webRoot": "${workspaceFolder}",
+            "preLaunchTask": "Open Website in Browser"
+        },
+        {
+            "name": "Launch Admin Dashboard",
+            "type": "msedge",
+            "request": "launch",
+            "url": "http://localhost/LocalIssuesWebsite/admin/login.html",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "name": "Launch Council Dashboard",
+            "type": "msedge",
+            "request": "launch",
+            "url": "http://localhost/LocalIssuesWebsite/council/login.html",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "name": "Debug with PHP Server",
+            "type": "msedge",
+            "request": "launch",
+            "url": "http://localhost:8080",
+            "webRoot": "${workspaceFolder}",
+            "preLaunchTask": "Start PHP Development Server"
+        }
+    ]
+}

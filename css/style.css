@@ -1,0 +1,216 @@
+/* Local Issues Reporter - Vibrant & Fixed Stylesheet */
+
+:root {
+    /* Color Palette */
+    --primary-color: #4f46e5; /* Indigo */
+    --primary-dark: #4338ca;
+    --secondary-color: #06b6d4; /* Cyan */
+    --accent-color: #f59e0b; /* Amber */
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    
+    /* Backgrounds */
+    --bg-gradient: linear-gradient(135deg, #f3f4f6 0%, #e0e7ff 100%);
+    --white: #ffffff;
+    
+    /* Text */
+    --text-main: #1f2937;
+    --text-light: #6b7280;
+    
+    /* Effects */
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(79, 70, 229, 0.1), 0 4px 6px -2px rgba(79, 70, 229, 0.05);
+    --radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    color: var(--text-main);
+    background: var(--bg-gradient);
+    min-height: 100vh;
+}
+
+.container { max-width: 1150px; margin: 0 auto; padding: 0 24px; }
+
+/* --- Animations --- */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in { animation: fadeInUp 0.8s ease-out forwards; }
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+
+/* --- Navbar --- */
+.navbar {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 1rem 0;
+    box-shadow: var(--shadow-md);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.nav-logo h2 {
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: 800;
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav-menu { display: flex; list-style: none; gap: 2.5rem; align-items: center; }
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 500;
+    position: relative;
+    transition: color 0.3s;
+}
+
+.nav-link:hover, .nav-link.active { color: var(--primary-color); }
+
+/* Admin Link Style (Not a button) */
+.admin-link {
+    font-weight: 600;
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+.admin-link:hover { color: var(--danger-color); }
+
+/* --- Buttons --- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    text-decoration: none;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4); }
+
+.btn-secondary {
+    background: white;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+.btn-secondary:hover { background: #f3f4f6; }
+
+.btn-success { background: var(--success-color); color: white; }
+
+/* --- Report Form (CRITICAL FIXES) --- */
+.report-form-section { padding: 4rem 0; }
+
+.form-container {
+    background: white;
+    padding: 3rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    max-width: 750px;
+    margin: 0 auto;
+    border-top: 5px solid var(--primary-color);
+}
+
+/* Progress Bar */
+.progress-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+    position: relative;
+}
+.progress-bar::after {
+    content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: #e5e7eb; z-index: 0;
+}
+.progress-step {
+    background: white; z-index: 1; padding: 0 15px; font-weight: 600; color: var(--text-light);
+}
+.progress-step.active { color: var(--primary-color); }
+
+/* *** THIS WAS MISSING BEFORE - FIXES OVERLAP *** */
+.form-step {
+    display: none; /* Hides inactive steps completely */
+}
+.form-step.active {
+    display: block; /* Shows only the active step */
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Inputs */
+.form-group { margin-bottom: 1.5rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 14px;
+    border: 2px solid #e5e7eb; border-radius: 8px;
+    background: #f9fafb; transition: 0.3s;
+}
+.form-group input:focus, .form-group textarea:focus {
+    outline: none; border-color: var(--primary-color); background: white;
+}
+
+/* File Upload */
+.file-upload-area {
+    border: 2px dashed #cbd5e1; padding: 2.5rem; text-align: center;
+    border-radius: var(--radius); background: #f8fafc;
+    position: relative; cursor: pointer; transition: 0.3s;
+}
+.file-upload-area:hover { border-color: var(--primary-color); background: #eff6ff; }
+.file-upload-area input {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0; cursor: pointer;
+}
+
+/* --- Cards --- */
+.categories-grid, .issues-list, .volunteers-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;
+}
+.category-card, .issue-card, .volunteer-card {
+    background: white; padding: 2rem; border-radius: var(--radius);
+    box-shadow: var(--shadow-md); transition: var(--transition);
+}
+.category-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); }
+.category-icon {
+    font-size: 2.5rem; color: var(--primary-color); margin-bottom: 1.5rem;
+    width: 70px; height: 70px; background: #e0e7ff;
+    display: flex; align-items: center; justify-content: center; border-radius: 50%;
+}
+
+/* --- Footer --- */
+.footer { background: #111827; color: #f3f4f6; padding: 4rem 0 2rem; margin-top: 5rem; text-align: center; }
+
+/* Mobile */
+.hamburger { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
+.bar { width: 25px; height: 3px; background: var(--primary-color); }
+@media (max-width: 768px) {
+    .nav-menu { display: none; } 
+    .hamburger { display: flex; }
+}

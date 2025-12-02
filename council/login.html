@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Municipal Council Login - Local Issues Reporter</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .council-login {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .council-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.05)"/><circle cx="50" cy="10" r="1" fill="rgba(255,255,255,0.08)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .council-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .council-logo i {
+            font-size: 4rem;
+            color: white;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .council-logo h1 {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .council-logo p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h2 {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(42, 82, 152, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .demo-credentials {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px dashed #dee2e6;
+        }
+
+        .demo-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .demo-header i {
+            color: #17a2b8;
+        }
+
+        .demo-header h3 {
+            color: #2c3e50;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .credentials {
+            margin-bottom: 1rem;
+        }
+
+        .credential-item {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .credential-item code {
+            background: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            z-index: 2;
+        }
+
+        .back-link a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .login-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+            
+            .back-link {
+                top: 1rem;
+                left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="council-login">
+        <div class="back-link">
+            <a href="../index.html">
+                <i class="fas fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+
+        <div class="login-container">
+            <div class="council-logo">
+                <i class="fas fa-university"></i>
+                <h1>Municipal Council Portal</h1>
+                <p>Secure access for council members and municipal staff</p>
+            </div>
+
+            <div class="login-card">
+                <div class="login-header">
+                    <h2>Council Member Login</h2>
+                    <p>Please enter your municipal credentials to access the council dashboard</p>
+                </div>
+
+                <form id="councilLoginForm" method="POST">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="username" name="username" required>
+                        </div>
+                        <span class="error-message" id="usernameError"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" name="password" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword()">
+                                <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                            </button>
+                        </div>
+                        <span class="error-message" id="passwordError"></span>
+                    </div>
+
+                    <button type="submit" class="btn login-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Access Council Dashboard
+                    </button>
+                </form>
+
+                <!-- Demo Credentials -->
+                <div class="demo-credentials">
+                    <div class="demo-header">
+                        <i class="fas fa-info-circle"></i>
+                        <h3>Demo Council Accounts</h3>
+                    </div>
+                    <div class="demo-content">
+                        <p style="margin-bottom: 1rem;">For demonstration purposes, use any of these accounts:</p>
+                        <div class="credentials">
+                            <div class="credential-item">
+                                <strong>Mayor:</strong> <code>council.mayor</code> / <code>admin123</code>
+                            </div>
+                            <div class="credential-item">
+                                <strong>Public Works:</strong> <code>council.public_works</code> / <code>admin123</code>
+                            </div>
+                            <div class="credential-item">
+                                <strong>Utilities:</strong> <code>council.utilities</code> / <code>admin123</code>
+                            </div>
+                            <div class="credential-item">
+                                <strong>Health Dept:</strong> <code>council.health</code> / <code>admin123</code>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="fillDemoCredentials('council.mayor')">
+                            Use Mayor Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Login Status</h2>
+                <span class="close" onclick="closeMessageModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="modalMessage" class="modal-message">
+                    <!-- Message will be inserted here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeMessageModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo credentials data
+        const demoAccounts = {
+            'council.mayor': { username: 'council.mayor', password: 'admin123' },
+            'council.public_works': { username: 'council.public_works', password: 'admin123' },
+            'council.utilities': { username: 'council.utilities', password: 'admin123' },
+            'council.health': { username: 'council.health', password: 'admin123' }
+        };
+
+        // Fill demo credentials
+        function fillDemoCredentials(accountType) {
+            const account = demoAccounts[accountType];
+            if (account) {
+                document.getElementById('username').value = account.username;
+                document.getElementById('password').value = account.password;
+            }
+        }
+
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('passwordToggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.className = 'fas fa-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.className = 'fas fa-eye';
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('councilLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showMessage('Error', 'Please fill in all fields.', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+            
+            try {
+                // Submit to PHP backend
+                const response = await fetch('../includes/council_login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const result = await response.json();
+                
+                // Reset button
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+                
+                if (result.success) {
+                    showMessage('Success', 'Login successful! Redirecting to council dashboard...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 2000);
+                } else {
+                    showMessage('Error', result.message || 'Invalid credentials for municipal council access.', 'error');
+                }
+            } catch (error) {
+                // Reset button
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+                
+                console.error('Council login error:', error);
+                showMessage('Error', 'Network error occurred. Please try again.', 'error');
+            }
+        });
+
+        // Show message modal
+        function showMessage(title, message, type) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').innerHTML = `
+                <div class="message ${type}">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    <p>${message}</p>
+                </div>
+            `;
+            document.getElementById('messageModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close message modal
+        function closeMessageModal() {
+            document.getElementById('messageModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('messageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeMessageModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('messageModal').style.display === 'block') {
+                closeMessageModal();
+            }
+        });
+    </script>
+</body>
+</html>

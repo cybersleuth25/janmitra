@@ -1,0 +1,12 @@
+{
+    "php.validate.executablePath": "C:\\xampp\\php\\php.exe",
+    "phpserver.port": 8080,
+    "phpserver.phpPath": "C:\\xampp\\php\\php.exe",
+    "phpserver.autoOpenOnReload": true,
+    "liveServer.settings.port": 5501,
+    "liveServer.settings.root": "/",
+    "files.associations": {
+        "*.php": "php"
+    },
+    "terminal.integrated.defaultProfile.windows": "PowerShell"
+}
